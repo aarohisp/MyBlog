@@ -1,11 +1,7 @@
-// targeting the parent element
 const blogContainer = document.querySelector(".blog__container");
 const blogModal = document.querySelector(".blog__modal__body");
-// global
 let globalStore = [];
 
-// -----------------------------------------------------
-// a function for creating a new card
 const newCard = ({
   id,
   imageUrl,
@@ -27,24 +23,18 @@ const newCard = ({
     <span class="badge bg-primary">${blogType}</span>
   </div>
   <div class="card-footer text-muted">
-    <button type="button" id="${id}" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
-    data-bs-target="#showblog" onclick="openBlog.apply(this, arguments)">Open Blog</button>
+    <button type="button" id="${id}" class="btn btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#showblog" onclick="openBlog.apply(this, arguments)">Open Blog</button>
   </div>
 </div>
 </div>`;
 
-// --------------------------------------------------
 const loadData = () => {
-  // access localstorage
-  // localStorage.getItem("blog") ===  localStorage.blog
-  const getInitialData = localStorage.blog; // if null, then
+  const getInitialData = localStorage.getItem("blog");
   if (!getInitialData) return;
 
-  // convert stringified-object to object
   const { cards } = JSON.parse(getInitialData);
 
-  // map around the array to generate HTML card and inject it to DOM
-  cards.map((blogObject) => {
+  cards.forEach((blogObject) => {
     const createNewBlog = newCard(blogObject);
     blogContainer.insertAdjacentHTML("beforeend", createNewBlog);
     globalStore.push(blogObject);
@@ -60,12 +50,9 @@ const updateLocalStorage = () => {
   );
 };
 
-//  function for save changes----------------------------------------
-
-// create a function which will trigerred on clicking on save changes in the modal
 const saveChanges = () => {
   const blogData = {
-    id: `${Date.now()}`, // generating a unique id for each card
+    id: `${Date.now()}`,
     imageUrl: document.getElementById("imageurl").value,
     blogTitle: document.getElementById("title").value,
     blogType: document.getElementById("type").value,
@@ -77,70 +64,39 @@ const saveChanges = () => {
 
   globalStore.push(blogData);
 
-  //  API  -> add t localStorage
   updateLocalStorage();
-  // provide some unique identification, i.e key, here key is "blog",
 };
 
-// function for deleting a card -------------------
-
 const deleteCard = (event) => {
-  // id
   event = window.event;
   const targetID = event.target.id;
-  const tagname = event.target.tagName; // BUTTON OR I
 
-  // assign the same id of card to button also
-
-  // search the globalStore, remove the object which matches with the id
   globalStore = globalStore.filter((blogObject) => blogObject.id !== targetID);
 
   updateLocalStorage();
 
-  // access DOM to remove them
-
-  if (tagname === "BUTTON") {
-    // task__container
-    return blogContainer.removeChild(
-      event.target.parentNode.parentNode.parentNode // col-lg-4
-    );
-  }
-
-  // else
-  // blog__container
-  return blogContainer.removeChild(
-    event.target.parentNode.parentNode.parentNode.parentNode // col-lg-4
-  );
+  const button =
+    event.target.tagName === "BUTTON" ? event.target : event.target.parentNode;
+  blogContainer.removeChild(button.closest(".col-lg-4"));
 };
 
-// function for editing
 const editCard = (event) => {
   event = window.event;
   const targetID = event.target.id;
-  const tagname = event.target.tagName;
 
-  let parentElement;
-  if (tagname === "BUTTON") {
-    parentElement = event.target.parentNode.parentNode;
-  } else {
-    parentElement = event.target.parentNode.parentNode.parentNode;
-  }
+  const parentElement = event.target.closest(".col-lg-4");
 
-  let blogTitle = parentElement.childNodes[5].childNodes[1];
-  let blogDescription = parentElement.childNodes[5].childNodes[3];
-  let blogType = parentElement.childNodes[5].childNodes[5];
-  let submitBtn = parentElement.childNodes[7].childNodes[1];
-  // console.log(taskTitle, taskDescription, taskType);
+  const blogTitle = parentElement.querySelector(".card-title");
+  const blogDescription = parentElement.querySelector(".card-text");
+  const blogType = parentElement.querySelector(".badge");
+  const submitBtn = parentElement.querySelector(".btn-outline-primary");
 
-  // setAttributes
-  blogTitle.setAttribute("contenteditable", "true");
-
-  blogDescription.setAttribute("contenteditable", "true");
-  blogType.setAttribute("contenteditable", "true");
+  blogTitle.contentEditable = "true";
+  blogDescription.contentEditable = "true";
+  blogType.contentEditable = "true";
   submitBtn.setAttribute("onclick", "saveEditChanges.apply(this, arguments)");
-  submitBtn.innerHTML = "Save Changes";
+  submitBtn.textContent = "Save Changes";
 
-  //  modal removed
   submitBtn.removeAttribute("data-bs-toggle");
   submitBtn.removeAttribute("data-bs-target");
 };
@@ -148,27 +104,20 @@ const editCard = (event) => {
 const saveEditChanges = (event) => {
   event = window.event;
   const targetID = event.target.id;
-  const tagname = event.target.tagName;
 
-  let parentElement;
-  if (tagname === "BUTTON") {
-    parentElement = event.target.parentNode.parentNode;
-  } else {
-    parentElement = event.target.parentNode.parentNode.parentNode;
-  }
+  const parentElement = event.target.closest(".col-lg-4");
 
-  let blogTitle = parentElement.childNodes[5].childNodes[1];
-  let blogDescription = parentElement.childNodes[5].childNodes[3];
-  let blogType = parentElement.childNodes[5].childNodes[5];
-  let submitBtn = parentElement.childNodes[7].childNodes[1];
+  const blogTitle = parentElement.querySelector(".card-title");
+  const blogDescription = parentElement.querySelector(".card-text");
+  const blogType = parentElement.querySelector(".badge");
+  const submitBtn = parentElement.querySelector(".btn-outline-primary");
 
   const updatedData = {
-    blogTitle: blogTitle.innerHTML,
-    blogDescription: blogDescription.innerHTML,
-    blogType: blogType.innerHTML,
+    blogTitle: blogTitle.textContent,
+    blogDescription: blogDescription.textContent,
+    blogType: blogType.textContent,
   };
 
-  // console.log(updatedData);
   globalStore = globalStore.map((blog) => {
     if (blog.id === targetID) {
       return {
@@ -179,22 +128,19 @@ const saveEditChanges = (event) => {
         blogDescription: updatedData.blogDescription,
       };
     }
-    return blog; // important statement
+    return blog;
   });
 
   updateLocalStorage();
 
-  blogTitle.setAttribute("contenteditable", "false");
+  blogTitle.contentEditable = "false";
+  blogDescription.contentEditable = "false";
+  blogType.contentEditable = "false";
 
-  blogDescription.setAttribute("contenteditable", "false");
-  blogType.setAttribute("contenteditable", "false");
-
-  // modal added
   submitBtn.setAttribute("onclick", "openBlog.apply(this, arguments)");
   submitBtn.setAttribute("data-bs-toggle", "modal");
   submitBtn.setAttribute("data-bs-target", "#showblog");
-
-  submitBtn.innerHTML = "Open Blog";
+  submitBtn.textContent = "Open Blog";
 };
 
 const htmlModalContent = ({
@@ -224,6 +170,9 @@ const openBlog = (event) => {
   const targetID = event.target.id;
 
   const getBlog = globalStore.filter(({ id }) => id === targetID);
-  // console.log(getBlog[0]);
+
   blogModal.innerHTML = htmlModalContent(getBlog[0]);
 };
+
+// Load data when the page is loaded
+document.addEventListener("DOMContentLoaded", loadData);
