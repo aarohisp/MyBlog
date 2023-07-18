@@ -1,114 +1,49 @@
-/* Reset styles and box-model */
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  box-sizing: border-box; /* box-model*/
 }
 
-/* Global styles */
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #f0f0f0; /* Light gray background */
-  color: #333; /* Dark text color */
-  line-height: 1.6;
-}
-
-/* Navbar */
-.navbar {
-  background-color: #1a5276; /* Darker blue background */
-  color: #fff; /* White text color */
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.navbar-brand {
-  font-size: 1.4rem; /* Slightly smaller font size */
-  font-weight: 700;
-  margin-right: 20px; /* Add margin to separate from the links */
-}
-
-.nav-link {
-  color: #fff; /* White link color */
-  font-size: 1.2rem; /* Slightly smaller font size */
-  margin-right: 15px; /* Add margin between links */
-}
-
-.nav-link:hover {
-  color: #f1c40f; /* Yellow link color on hover */
-}
-
-.navbar-toggler-icon {
-  color: #fff; /* White color for the toggle icon */
-}
-
-/* Hero Section */
-.hero {
-  background-color: #3498db; /* Bright blue background */
-  color: #fff; /* White text color */
-  padding: 80px 0;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 3.5rem;
-  font-weight: 700;
-}
-
-.hero p {
-  font-size: 1.4rem; /* Slightly larger font size */
-}
-
-/* Blog Posts Section */
-.blog-posts {
-  padding: 50px 0;
-}
-
-.card {
-  border: none;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  background-color: #fff; /* White background */
-}
-
-.card:hover {
-  transform: translateY(-5px);
+  background-color: #ebf2ff;
 }
 
 .card-img-top {
-  height: 250px;
-  object-fit: cover;
+  padding: 15px;
+  height: 300px;
+  width: auto;
 }
 
-.card-body {
-  padding: 20px;
+.place__holder__image {
+  width: 100%;
 }
 
-.card-title {
-  font-size: 1.8rem;
+.subscribe {
+  background-color: #007bff;
+  color: #fff;
+  padding: 50px 0;
+  text-align: center;
+}
+
+.subscribe h2 {
+  font-size: 2rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.card-text {
-  color: #555;
-  line-height: 1.6;
+.subscribe p {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
 }
 
-/* Modal */
-.modal-header {
-  background-color: #3498db; /* Bright blue background */
-  color: #fff; /* White text color */
+.subscribe-form {
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-.modal-footer {
-  border-top: none;
-}
-
-/* Add New Post Modal */
-.modal-dialog {
-  max-width: 800px;
+.subscribe-form input.form-control {
+  font-size: 1rem;
 }
 
 /* Footer */
@@ -119,91 +54,6 @@ footer {
   padding: 15px 0;
 }
 
-/* Buttons */
-.btn-primary {
-  background-color: #3498db; /* Bright blue background */
-  border-color: #3498db;
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding: 10px 20px;
-  cursor: pointer; /* Adding cursor pointer to indicate interactivity */
-}
-
-.btn-primary:hover {
-  background-color: #f1c40f; /* Yellow button color on hover */
-  border-color: #f1c40f;
-}
-
-.btn-secondary {
-  background-color: #f1f1f1; /* Light gray background */
-  border-color: #f1f1f1;
-  color: #333; /* Dark text color */
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding: 10px 20px;
-  cursor: pointer; /* Adding cursor pointer to indicate interactivity */
-}
-
-.btn-secondary:hover {
-  background-color: #e0e0e0; /* Slightly darker gray on hover */
-  border-color: #e0e0e0;
-}
-
-/* Custom Styles for Header and Layout */
-.container {
-  padding: 20px;
-}
-
-/* Center the Navbar brand and adjust padding */
-.navbar-brand {
-  padding: 0;
-  margin-right: 0;
-}
-
-/* Center the Navbar links */
-.navbar-nav {
-  align-items: center;
-}
-
-/* Center the Subscribe Section content */
-.subscribe-content {
-  text-align: center;
-}
-
-/* Add margin to the bottom of the Footer */
-.footer {
-  margin-top: 30px;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .navbar-brand {
-    font-size: 1.6rem;
-  }
-
-  .hero h1 {
-    font-size: 3rem;
-  }
-
-  .hero p {
-    font-size: 1rem;
-  }
-
-  .card-img-top {
-    height: 200px;
-  }
-
-  .card-body {
-    padding: 15px;
-  }
-
-  .card-title {
-    font-size: 1.5rem;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    font-size: 1rem;
-    padding: 8px 16px;
-  }
+footer p {
+  font-size: 1rem;
 }
