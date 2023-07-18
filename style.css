@@ -1,20 +1,170 @@
+/* Reset styles and box-model */
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* box-model*/
+  box-sizing: border-box;
 }
 
+/* Global styles */
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #ebf2ff;
+  background-color: #f8f8f8; /* Light gray background */
+  color: #333; /* Dark text color */
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #007bff; /* Primary blue background */
+  color: #fff; /* White text color */
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.navbar-toggler-icon {
+  color: #fff; /* White color for the toggle icon */
+}
+
+/* Hero Section */
+.hero {
+  background-color: #f0f5ff; /* Light blue background */
+  color: #333; /* Dark text color */
+  padding: 80px 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 1.2rem;
+}
+
+/* Blog Posts Section */
+.blog-posts {
+  padding: 50px 0;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  background-color: #fff; /* White background */
+}
+
+.card:hover {
+  transform: translateY(-5px);
 }
 
 .card-img-top {
-  padding: 15px;
-  height: 300px;
-  width: auto;
+  height: 250px;
+  object-fit: cover;
 }
 
-.place__holder__image {
-  width: 100%;
+.card-body {
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Modal */
+.modal-header {
+  background-color: #007bff; /* Primary blue background */
+  color: #fff; /* White text color */
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+/* Add New Post Modal */
+.modal-dialog {
+  max-width: 800px;
+}
+
+/* Footer */
+footer {
+  background-color: #333; /* Dark background */
+  color: #fff; /* White text color */
+  text-align: center;
+  padding: 15px 0;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  cursor: pointer; /* Adding cursor pointer to indicate interactivity */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #f1f1f1; /* Light gray background */
+  border-color: #f1f1f1;
+  color: #333; /* Dark text color */
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  cursor: pointer; /* Adding cursor pointer to indicate interactivity */
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0; /* Slightly darker gray on hover */
+  border-color: #e0e0e0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.6rem;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .card-img-top {
+    height: 200px;
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 1rem;
+    padding: 8px 16px;
+  }
 }
