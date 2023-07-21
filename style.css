@@ -57,3 +57,41 @@ footer {
 footer p {
   font-size: 1rem;
 }
+
+/* Additional CSS for fixed-size blog frames and expandable content */
+
+.card {
+  /* Set a fixed height for the blog frame */
+  height: 500px;
+  overflow: hidden; /* Hide overflowing content */
+}
+
+.card.opened {
+  /* When the card is opened, remove height restriction */
+  height: auto;
+}
+
+.card.opened .card-body {
+  /* Show the full blog description and adjust padding */
+  padding: 15px;
+}
+
+.card.opened .card-footer {
+  /* Show the "Open Blog" button in the footer */
+  display: block;
+}
+
+.card.opened .card-footer button {
+  /* Adjust the style of the "Open Blog" button in the expanded state */
+  margin-top: 15px;
+}
+
+.card.closed .card-text {
+  /* Hide the full blog description by default */
+  display: none;
+}
+
+.card.closed .badge {
+  /* Hide the blog type badge by default */
+  display: none;
+}
