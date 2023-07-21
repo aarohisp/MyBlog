@@ -222,8 +222,16 @@ const htmlModalContent = ({
 const openBlog = (event) => {
   event = window.event;
   const targetID = event.target.id;
+  const targetCard = event.target.closest(".card");
+  const isOpened = targetCard.classList.contains("opened");
 
-  const getBlog = globalStore.filter(({ id }) => id === targetID);
-  // console.log(getBlog[0]);
-  blogModal.innerHTML = htmlModalContent(getBlog[0]);
+  if (isOpened) {
+    // If the card is already opened, close it
+    targetCard.classList.remove("opened");
+    targetCard.classList.add("closed");
+  } else {
+    // If the card is closed, open it
+    targetCard.classList.remove("closed");
+    targetCard.classList.add("opened");
+  }
 };
