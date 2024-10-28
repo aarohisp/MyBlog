@@ -49,7 +49,7 @@ stages:
             displayName: "Build and Push to Azure Container Registry"
             inputs:
               azureSubscription: "azure-connection"
-              scriptType: "ps" # Use PowerShell Core instead of Bash
+              scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
                 $env:GIT_DISCOVERY_ACROSS_FILESYSTEM=1
@@ -57,8 +57,15 @@ stages:
                 az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
                 echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile .
+
+                # Navigate to the root directory if not already there
+                echo "Build SOurce directoy is $(Build.SourcesDirectory)"
+                cd "$(Build.SourcesDirectory)"
+
+                # Build and push images directly, specify Dockerfile location
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile --no-cache .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile --no-cache .
+
                 echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
