@@ -46,7 +46,7 @@ stages:
             displayName: "Create Dockerfile for Static Site"
 
           - task: AzureCLI@2
-            export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+            export GIT_DISCOVERY_ACROSS_FILESYSTEM=1 .
             displayName: "Build and Push to Azure Container Registry"
             inputs:
               azureSubscription: "azure-connection"
