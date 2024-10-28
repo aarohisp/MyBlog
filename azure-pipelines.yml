@@ -54,11 +54,11 @@ stages:
               inlineScript: |
                 $env:GIT_DISCOVERY_ACROSS_FILESYSTEM=1
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
-                az acr login --name $(ACR_NAME) || exit 1
+                az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
                 echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile . || exit 1
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile . || exit 1
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile .
                 echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
