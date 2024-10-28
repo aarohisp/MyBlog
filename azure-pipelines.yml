@@ -42,7 +42,7 @@ stages:
               echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
               echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
               echo "Dockerfile created with the following content:"
-              cat Dockerfile
+              type Dockerfile
             displayName: "Create Dockerfile for Static Site"
 
           - task: AzureCLI@2
