@@ -67,13 +67,22 @@ stages:
                 az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
 
           - task: KubernetesManifest@0
-            displayName: "Apply Kubernetes Deployment"
+            displayName: "Apply Blue Deployment"
             inputs:
               action: "apply"
               namespace: "default"
-              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the deployment
+              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the blue deployment
               containers: |
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
+
+          - task: KubernetesManifest@0
+            displayName: "Apply Green Deployment"
+            inputs:
+              action: "apply"
+              namespace: "default"
+              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the green deployment
+              containers: |
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
 
           - script: |
               echo "Deployment completed successfully"
