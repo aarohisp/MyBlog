@@ -24,8 +24,10 @@ stages:
     jobs:
       - job: PackageFiles
         displayName: "Package HTML/CSS/JS into a Container Image"
+        pool:
+          name: my-personal-computer # Specify the self-hosted agent pool
         steps:
-          - checkout: self 
+          - checkout: self
 
           - script: |
               echo "Checking if repository files are available after checkout..."
@@ -64,6 +66,8 @@ stages:
     jobs:
       - job: DeployToAKS
         displayName: "Deploy Static Site to AKS"
+        pool:
+          name: my-personal-computer # Specify the self-hosted agent pool
         steps:
           - task: AzureCLI@2
             displayName: "Login to AKS Cluster"
