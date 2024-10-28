@@ -47,7 +47,8 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(TAG) .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) .
 
   - stage: Deploy
     dependsOn: Package
