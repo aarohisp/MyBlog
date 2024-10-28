@@ -27,15 +27,15 @@ stages:
         steps:
           - checkout: MyBlogRepo  # Explicitly set repository for checkout
 
-          - task: Bash@3
+          - script: |
+              echo "Starting Dockerfile creation for static site..."
+              echo "FROM nginx:alpine" > Dockerfile
+              echo "COPY index.html /usr/share/nginx/html/" >> Dockerfile
+              echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
+              echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
+              echo "Dockerfile created with the following content:"
+              cat Dockerfile
             displayName: "Create Dockerfile for Static Site"
-            inputs:
-              targetType: "inline"
-              script: |
-                echo "FROM nginx:alpine" > Dockerfile
-                echo "COPY index.html /usr/share/nginx/html/" >> Dockerfile
-                echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
-                echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
 
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
@@ -44,8 +44,13 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
+                echo "Logging into Azure Container Registry: $(ACR_NAME)"
+                az acr login --name $(ACR_NAME)
+                echo "Building and pushing images to ACR..."
+                echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) .
                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) .
+                echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
     dependsOn: Package
@@ -61,7 +66,9 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
+                echo "Retrieving AKS credentials for cluster: $(AKS_CLUSTER) in resource group: $(RESOURCE_GROUP)"
                 az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
+                echo "Logged into AKS cluster successfully."
 
           - task: KubernetesManifest@0
             displayName: "Apply Blue Deployment"
@@ -71,6 +78,8 @@ stages:
               manifests: "manifests/deployment.yaml"
               containers: |
                 $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
+            env:
+              DEBUG: "true"
 
           - task: KubernetesManifest@0
             displayName: "Apply Green Deployment"
@@ -80,7 +89,12 @@ stages:
               manifests: "manifests/deployment.yaml"
               containers: |
                 $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
+            env:
+              DEBUG: "true"
 
           - script: |
               echo "Deployment completed successfully"
+              echo "Deployed images:"
+              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
+              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
             displayName: "Deployment Confirmation"
