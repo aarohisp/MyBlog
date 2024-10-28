@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myblog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myblog-static-site
+  template:
+    metadata:
+      labels:
+        app: myblog-static-site
+    spec:
+      containers:
+        - name: nginx-container
+          image: mernblogregistry.azurecr.io/myblog-static-site:$(TAG) # Uses the image built in your pipeline
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myblog-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: myblog-static-site
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

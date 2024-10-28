@@ -1,79 +1,79 @@
 trigger:
   branches:
     include:
-      - main  # Trigger on changes to the main branch
+      - main # Trigger on changes to the main branch
 
 resources:
   repositories:
     - repository: MyBlogRepo
       type: github
-      name: aarohisp/MyBlog  # Replace with your repository name
-      endpoint: GitHub-Connection  # Replace with your GitHub service connection name
+      name: aarohisp/MyBlog # Replace with your repository name
+      endpoint: GitHub-Connection # Replace with your GitHub service connection name
 
 variables:
-  AKS_CLUSTER: "<AKS_CLUSTER_NAME>"           # Replace with your AKS cluster name
-  RESOURCE_GROUP: "<AKS_RESOURCE_GROUP>"      # Replace with your AKS resource group
-  ACR_NAME: "<YOUR_ACR_NAME>"                 # Replace with your ACR name
-  IMAGE_NAME: "myblog-static-site"            # Name for the container image
-  DEPLOYMENT_NAME: "myblog-deployment"        # Kubernetes deployment name
-  TAG: "$(Build.BuildId)"                     # Unique tag for each build
+  AKS_CLUSTER: "MernBlog" # Replace with your AKS cluster name
+  RESOURCE_GROUP: "Mern_blog" # Replace with your AKS resource group
+  ACR_NAME: "mernblogregistry" # Replace with your ACR name
+  IMAGE_NAME: "myblog-static-site" # Name for the container image
+  DEPLOYMENT_NAME: "myblog-deployment" # Kubernetes deployment name
+  TAG: "$(Build.BuildId)" # Unique tag for each build
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 stages:
-- stage: Package
-  displayName: "Package Static Files"
-  jobs:
-    - job: PackageFiles
-      displayName: "Package HTML/CSS/JS into a Container Image"
-      steps:
-        - checkout: self
+  - stage: Package
+    displayName: "Package Static Files"
+    jobs:
+      - job: PackageFiles
+        displayName: "Package HTML/CSS/JS into a Container Image"
+        steps:
+          - checkout: self
 
-        - task: Bash@3
-          displayName: "Create Dockerfile for Static Site"
-          inputs:
-            targetType: 'inline'
-            script: |
-              echo "FROM nginx:alpine" > Dockerfile
-              echo "COPY index.html /usr/share/nginx/html/" >> Dockerfile
-              echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
-              echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
+          - task: Bash@3
+            displayName: "Create Dockerfile for Static Site"
+            inputs:
+              targetType: "inline"
+              script: |
+                echo "FROM nginx:alpine" > Dockerfile
+                echo "COPY index.html /usr/share/nginx/html/" >> Dockerfile
+                echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
+                echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
 
-        - task: AzureCLI@2
-          displayName: "Build and Push to Azure Container Registry"
-          inputs:
-            azureSubscription: "<Your Azure Subscription>"  # Set your Azure subscription
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(TAG) .
+          - task: AzureCLI@2
+            displayName: "Build and Push to Azure Container Registry"
+            inputs:
+              azureSubscription: "Visual Studio Enterprise Subscription" # Set your Azure subscription
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(TAG) .
 
-- stage: Deploy
-  dependsOn: Package
-  displayName: "Deploy to AKS"
-  jobs:
-    - job: DeployToAKS
-      displayName: "Deploy Static Site to AKS"
-      steps:
-        - task: AzureCLI@2
-          displayName: "Login to AKS Cluster"
-          inputs:
-            azureSubscription: "<Your Azure Subscription>"
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
+  - stage: Deploy
+    dependsOn: Package
+    displayName: "Deploy to AKS"
+    jobs:
+      - job: DeployToAKS
+        displayName: "Deploy Static Site to AKS"
+        steps:
+          - task: AzureCLI@2
+            displayName: "Login to AKS Cluster"
+            inputs:
+              azureSubscription: "<Your Azure Subscription>"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
 
-        - task: KubernetesManifest@0
-          displayName: "Apply Kubernetes Deployment"
-          inputs:
-            action: "apply"
-            namespace: "default"
-            manifests: "manifests/deployment.yaml"  # Ensure this YAML file defines the deployment
-            containers: |
-              $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
+          - task: KubernetesManifest@0
+            displayName: "Apply Kubernetes Deployment"
+            inputs:
+              action: "apply"
+              namespace: "default"
+              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the deployment
+              containers: |
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
 
-        - script: |
-            echo "Deployment completed successfully"
-          displayName: "Deployment Confirmation"
+          - script: |
+              echo "Deployment completed successfully"
+            displayName: "Deployment Confirmation"
