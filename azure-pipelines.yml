@@ -49,7 +49,7 @@ stages:
             displayName: "Build and Push to Azure Container Registry"
             inputs:
               azureSubscription: "azure-connection"
-              scriptType: "pscore" # Use PowerShell Core instead of Bash
+              scriptType: "ps" # Use PowerShell Core instead of Bash
               scriptLocation: "inlineScript"
               inlineScript: |
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
