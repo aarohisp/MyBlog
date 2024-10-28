@@ -46,20 +46,20 @@ stages:
             displayName: "Create Dockerfile for Static Site"
 
           - task: AzureCLI@2
-            export GIT_DISCOVERY_ACROSS_FILESYSTEM=1 .
-            displayName: "Build and Push to Azure Container Registry"
-            inputs:
-              azureSubscription: "azure-connection"
-              scriptType: "ps" # Use PowerShell Core instead of Bash
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                echo "Logging into Azure Container Registry: $(ACR_NAME)"
-                az acr login --name $(ACR_NAME)
-                echo "Building and pushing images to ACR..."
-                echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile .
-                echo "Images built and pushed successfully to ACR."
+          displayName: "Build and Push to Azure Container Registry"
+          inputs:
+            azureSubscription: "azure-connection"
+            scriptType: "ps" # Use PowerShell Core instead of Bash
+            scriptLocation: "inlineScript"
+            inlineScript: |
+              $env:GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+              echo "Logging into Azure Container Registry: $(ACR_NAME)"
+              az acr login --name $(ACR_NAME) || exit 1
+              echo "Building and pushing images to ACR..."
+              echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
+              az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile . || exit 1
+              az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile . || exit 1
+              echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
     dependsOn: Package
