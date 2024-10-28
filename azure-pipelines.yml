@@ -43,7 +43,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
-              azureSubscription: "Visual Studio Enterprise Subscription" # Set your Azure subscription
+              azureSubscription: "azure-connection" # Updated to your service connection
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
@@ -60,7 +60,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Login to AKS Cluster"
             inputs:
-              azureSubscription: "<Your Azure Subscription>"
+              azureSubscription: "azure-connection" # Updated to your service connection
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
