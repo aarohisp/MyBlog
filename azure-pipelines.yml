@@ -9,18 +9,6 @@ resources:
       type: github
       name: aarohisp/MyBlog # Replace with your repository name
       endpoint: GitHub-Connection # Replace with your GitHub service connection name
-
-variables:
-  AKS_CLUSTER: "MernBlog" # Replace with your AKS cluster name
-  RESOURCE_GROUP: "Mern_blog" # Replace with your AKS resource group
-  ACR_NAME: "mernblogregistry" # Replace with your ACR name
-  IMAGE_NAME: "myblog-static-site" # Name for the container image
-  DEPLOYMENT_NAME: "myblog-deployment" # Kubernetes deployment name
-  TAG: "$(Build.BuildId)" # Unique tag for each build
-
-pool:
-  vmImage: "ubuntu-latest"
-
 stages:
   - stage: Package
     displayName: "Package Static Files"
@@ -43,7 +31,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
-              azureSubscription: "azure-connection" # Updated to your service connection
+              azureSubscription: "azure-connection" # Ensure this matches your service connection
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
