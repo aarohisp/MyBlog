@@ -16,7 +16,7 @@ variables:
   RESOURCE_GROUP: "Mern_blog"
   AKS_CLUSTER: "MernBlog"
   IMAGE_NAME: "myblog-static-site"
-  TAG: "$(Build.BuildId)"  # Unique tag for the image
+  TAG: "$(Build.BuildId)"
 
 stages:
   - stage: Package
@@ -25,7 +25,7 @@ stages:
       - job: PackageFiles
         displayName: "Package HTML/CSS/JS into a Container Image"
         steps:
-          - checkout: self
+          - checkout: MyBlogRepo  # Explicitly set repository for checkout
 
           - task: Bash@3
             displayName: "Create Dockerfile for Static Site"
@@ -40,7 +40,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
-              azureSubscription: "azure-connection" 
+              azureSubscription: "azure-connection"
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
