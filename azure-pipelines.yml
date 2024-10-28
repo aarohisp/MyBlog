@@ -31,7 +31,7 @@ stages:
 
           - script: |
               echo "Checking if repository files are available after checkout..."
-              ls -la
+              dir
               echo "Repository contents should be visible here"
             displayName: "Verify Repository Checkout"
 
