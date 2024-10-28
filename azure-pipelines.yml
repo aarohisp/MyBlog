@@ -49,7 +49,7 @@ stages:
             displayName: "Build and Push to Azure Container Registry"
             inputs:
               azureSubscription: "azure-connection"
-              scriptType: "bash"
+              scriptType: "pscore" # Use PowerShell Core instead of Bash
               scriptLocation: "inlineScript"
               inlineScript: |
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
@@ -57,7 +57,7 @@ stages:
                 echo "Building and pushing images to ACR..."
                 echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG)
                 echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
