@@ -56,8 +56,8 @@ stages:
                 az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
                 echo "Using Image Name: $(IMAGE_NAME) and Tag: $(TAG)"
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile .
                 echo "Images built and pushed successfully to ACR."
 
   - stage: Deploy
