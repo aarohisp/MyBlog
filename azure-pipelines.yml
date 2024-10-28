@@ -7,17 +7,17 @@ resources:
   repositories:
     - repository: MyBlogRepo
       type: github
-      name: aarohisp/MyBlog # Replace with your repository name
-      endpoint: GitHub-Connection # Replace with your GitHub service connection name
+      name: aarohisp/MyBlog
+      endpoint: GitHub-Connection
 
 variables:
   # AKS variables
-  ACR_NAME: "mernblogregistry"                     # Azure Container Registry name
-  RESOURCE_GROUP: "Mern_blog"                      # Use 'Mern_blog' for your non-system resource group
-  AKS_CLUSTER: "MernBlog"                          # AKS cluster name
-  IMAGE_NAME: "myblog-static-site"                 # Container image name
-  TAG: "$(Build.BuildId)"                          # Unique tag for the image
-  
+  ACR_NAME: "mernblogregistry"
+  RESOURCE_GROUP: "Mern_blog"
+  AKS_CLUSTER: "MernBlog"
+  IMAGE_NAME: "myblog-static-site"
+  TAG: "$(Build.BuildId)"  # Unique tag for the image
+
 stages:
   - stage: Package
     displayName: "Package Static Files"
@@ -40,7 +40,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
-              azureSubscription: "azure-connection" # Ensure this matches your service connection
+              azureSubscription: "azure-connection" 
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
@@ -57,7 +57,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Login to AKS Cluster"
             inputs:
-              azureSubscription: "azure-connection" # Updated to your service connection
+              azureSubscription: "azure-connection"
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
@@ -68,7 +68,7 @@ stages:
             inputs:
               action: "apply"
               namespace: "default"
-              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the blue deployment
+              manifests: "manifests/deployment.yaml"
               containers: |
                 $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
 
@@ -77,7 +77,7 @@ stages:
             inputs:
               action: "apply"
               namespace: "default"
-              manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the green deployment
+              manifests: "manifests/deployment.yaml"
               containers: |
                 $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
 
