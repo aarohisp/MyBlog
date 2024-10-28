@@ -63,8 +63,8 @@ stages:
                 cd "$(Build.SourcesDirectory)"
 
                 # Build and push images directly, specify Dockerfile location
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile --no-cache .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile --no-cache .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f Dockerfile .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f Dockerfile .
 
                 echo "Images built and pushed successfully to ACR."
 
