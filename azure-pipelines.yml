@@ -9,6 +9,15 @@ resources:
       type: github
       name: aarohisp/MyBlog # Replace with your repository name
       endpoint: GitHub-Connection # Replace with your GitHub service connection name
+
+variables:
+  # AKS variables
+  ACR_NAME: "mernblogregistry"                     # Azure Container Registry name
+  RESOURCE_GROUP: "Mern_blog"                      # Use 'Mern_blog' for your non-system resource group
+  AKS_CLUSTER: "MernBlog"                          # AKS cluster name
+  IMAGE_NAME: "myblog-static-site"                 # Container image name
+  TAG: "$(Build.BuildId)"                          # Unique tag for the image
+  
 stages:
   - stage: Package
     displayName: "Package Static Files"
