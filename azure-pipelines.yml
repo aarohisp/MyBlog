@@ -25,8 +25,12 @@ stages:
       - job: PackageFiles
         displayName: "Package HTML/CSS/JS into a Container Image"
         steps:
-          - checkout: MyBlogRepo  # Explicitly set repository for checkout
-
+          - checkout: self 
+           - script: |
+              echo "Checking if repository files are available after checkout..."
+              ls -la
+              echo "Repository contents should be visible here"
+            displayName: "Verify Repository Checkout"
           - script: |
               echo "Starting Dockerfile creation for static site..."
               echo "FROM nginx:alpine" > Dockerfile
