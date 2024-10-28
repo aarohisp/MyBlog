@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-  blog-app:
-    build:
-      context: . # Use the Dockerfile in the current directory
-    ports:
-      - "8080:80" # Map local port 8080 to container port 80
-    restart: always
