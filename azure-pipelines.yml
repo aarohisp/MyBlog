@@ -52,7 +52,7 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                $env:GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+                export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
