@@ -53,22 +53,18 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                $env:GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+                # Set environment variable directly for ACR
+                $env:GIT_DISCOVERY_ACROSS_FILESYSTEM = "1"
+
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
-                echo "Checking for .git directory..."
 
-                if (!(Test-Path -Path "$(Build.SourcesDirectory)\.git")) {
-                    Write-Host ".git directory not found. Please ensure you are within the correct repository."
-                    exit 1
-                }
-
-                echo "Starting build and push to ACR..."
+                echo "Navigating to build source directory $(Build.SourcesDirectory)"
                 cd "$(Build.SourcesDirectory)"
 
-                # Build and push images directly, specify Dockerfile location
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) --no-push -f Dockerfile .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) --no-push -f Dockerfile .
+                echo "Building and pushing images to ACR..."
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)\Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)\Dockerfile" .
 
                 echo "Images built and pushed successfully to ACR."
 
