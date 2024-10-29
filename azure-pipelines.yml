@@ -25,7 +25,7 @@ stages:
       - job: PackageFiles
         displayName: "Package HTML/CSS/JS into a Container Image"
         pool:
-          name: my-personal-computer # Specify the self-hosted agent pool
+          name: my-personal-computer
         steps:
           - checkout: self
             fetchDepth: 0 # This clones the full repository history
