@@ -99,6 +99,7 @@ stages:
           - task: KubernetesManifest@0
             displayName: "Apply Blue Deployment"
             inputs:
+              kubernetesServiceConnection: "kubernetes-connection"
               action: "apply"
               namespace: "default"
               manifests: "manifests/deployment.yaml"
@@ -110,6 +111,7 @@ stages:
           - task: KubernetesManifest@0
             displayName: "Apply Green Deployment"
             inputs:
+              kubernetesServiceConnection: "kubernetes-connection"
               action: "apply"
               namespace: "default"
               manifests: "manifests/deployment.yaml"
