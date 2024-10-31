@@ -53,7 +53,7 @@ stages:
             displayName: "Build and Push to Azure Container Registry"
             inputs:
               azureSubscription: "azure-connection"
-              scriptType: "ps"
+              scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
@@ -113,7 +113,6 @@ stages:
               echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
               echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
             displayName: "Deployment Confirmation"
-
 # trigger:
 #   branches:
 #     include:
