@@ -72,7 +72,7 @@ stages:
       - job: DeployToAKS
         displayName: "Deploy Static Site to AKS"
         pool:
-          vmImage: "ubuntu-latest" # Using Azure-hosted agent
+          vmImage: "ubuntu-latest" # Using Azure-hosted agent instead of self-hosted
         steps:
           - task: AzureCLI@2
             displayName: "Login to AKS Cluster"
@@ -84,6 +84,17 @@ stages:
                 echo "Retrieving AKS credentials for cluster: $(AKS_CLUSTER) in resource group: $(RESOURCE_GROUP)"
                 az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
                 echo "Logged into AKS cluster successfully."
+
+          # Apply Kubernetes manifest with Kubernetes@1 task
+          - task: Kubernetes@1
+            displayName: "Apply Deployment using Kubernetes@1 Task"
+            inputs:
+              connectionType: "Kubernetes Service Connection"
+              kubernetesServiceEndpoint: "kubernetes-connection"
+              command: "apply"
+              useConfigurationFile: true
+              configuration: "manifests/deployment.yaml"
+              namespace: "default"
 
           - task: KubernetesManifest@0
             displayName: "Apply Blue Deployment"
@@ -113,83 +124,3 @@ stages:
               echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
               echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
             displayName: "Deployment Confirmation"
-# trigger:
-#   branches:
-#     include:
-#       - main # Trigger on changes to the main branch
-
-# resources:
-#   repositories:
-#     - repository: MyBlogRepo
-#       type: github
-#       name: aarohisp/MyBlog # Replace with your repository name
-#       endpoint: GitHub-Connection # Replace with your GitHub service connection name
-
-# variables:
-#   AKS_CLUSTER: "MernBlog" # Replace with your AKS cluster name
-#   RESOURCE_GROUP: "Mern_blog" # Replace with your AKS resource group
-#   ACR_NAME: "mernblogregistry" # Replace with your ACR name
-#   IMAGE_NAME: "myblog-static-site" # Name for the container image
-#   DEPLOYMENT_NAME: "myblog-deployment" # Kubernetes deployment name
-#   TAG: "$(Build.BuildId)" # Unique tag for each build
-
-# pool:
-#   vmImage: "ubuntu-latest"
-
-# stages:
-#   - stage: Package
-#     displayName: "Package Static Files"
-#     jobs:
-#       - job: PackageFiles
-#         displayName: "Package HTML/CSS/JS into a Container Image"
-#         steps:
-#           - checkout: self
-
-#           - task: Bash@3
-#             displayName: "Create Dockerfile for Static Site"
-#             inputs:
-#               targetType: "inline"
-#               script: |
-#                 echo "FROM nginx:alpine" > Dockerfile
-#                 echo "COPY index.html /usr/share/nginx/html/" >> Dockerfile
-#                 echo "COPY style.css /usr/share/nginx/html/" >> Dockerfile
-#                 echo "COPY script.js /usr/share/nginx/html/" >> Dockerfile
-
-#           - task: AzureCLI@2
-#             displayName: "Build and Push to Azure Container Registry"
-#             inputs:
-#               azureSubscription: "azure-connection" # Updated to your service connection
-#               scriptType: "bash"
-#               scriptLocation: "inlineScript"
-#               inlineScript: |
-#                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) .
-#                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) .
-
-#   - stage: Deploy
-#     dependsOn: Package
-#     displayName: "Deploy to AKS"
-#     jobs:
-#       - job: DeployToAKS
-#         displayName: "Deploy Static Site to AKS"
-#         steps:
-#           - task: AzureCLI@2
-#             displayName: "Login to AKS Cluster"
-#             inputs:
-#               azureSubscription: "azure-connection" # Updated to your service connection
-#               scriptType: "bash"
-#               scriptLocation: "inlineScript"
-#               inlineScript: |
-#                 az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
-
-#           - task: KubernetesManifest@0
-#             displayName: "Apply Kubernetes Deployment"
-#             inputs:
-#               action: "apply"
-#               namespace: "default"
-#               manifests: "manifests/deployment.yaml" # Ensure this YAML file defines the deployment
-#               containers: |
-#                 $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
-
-#           - script: |
-#               echo "Deployment completed successfully"
-#             displayName: "Deployment Confirmation"
