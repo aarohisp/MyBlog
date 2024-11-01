@@ -20,7 +20,7 @@ body {
 }
 
 .subscribe {
-  background-color: #00ff40;
+  background-color: #0f0097;
   color: #fff;
   padding: 50px 0;
   text-align: center;
@@ -48,7 +48,7 @@ body {
 
 /* Footer */
 footer {
-  background-color: #0b5e00; /* Dark background */
+  background-color: #292929; /* Dark background */
   color: #fff; /* White text color */
   text-align: center;
   padding: 15px 0;

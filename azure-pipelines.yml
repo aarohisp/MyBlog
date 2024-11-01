@@ -17,7 +17,7 @@ variables:
   AKS_CLUSTER: "MernBlog"
   IMAGE_NAME: "myblog-static-site"
   TAG: "$(Build.BuildId)"
-  DEPLOYMENT_COLOR: "green"
+  DEPLOYMENT_COLOR: "blue"
 
 pool:
   vmImage: "ubuntu-latest"
@@ -39,6 +39,7 @@ stages:
               ls -al
               echo "Repository contents should be visible here"
             displayName: "Verify Repository Checkout"
+
           - script: |
               echo "Starting Dockerfile creation for static site..."
               echo "FROM nginx:alpine" > Dockerfile
@@ -48,6 +49,7 @@ stages:
               echo "Dockerfile created with the following content:"
               cat Dockerfile
             displayName: "Create Dockerfile for Static Site"
+
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
@@ -58,10 +60,48 @@ stages:
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
                 echo "Images built and pushed successfully to ACR."
                 az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
+  - stage: Deploy
+    dependsOn: Package
+    displayName: "Deploy to AKS"
+    jobs:
+      - job: DeployToAKS
+        displayName: "Deploy Static Site to AKS"
+        pool:
+          vmImage: "ubuntu-latest" # Using Azure-hosted agent instead of self-hosted
+        steps:
+          - task: AzureCLI@2
+            displayName: "Login to AKS Cluster"
+            inputs:
+              azureSubscription: "azure-connection"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                echo "Retrieving AKS credentials for cluster: $(AKS_CLUSTER) in resource group: $(RESOURCE_GROUP)"
+                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER) || exit 1
+                echo "Logged into AKS cluster successfully."
+          # Echo out the image names for debugging
+          - script: |
+              echo "Using image for blue deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG)"
+            displayName: "Echo Image Names for Debugging"
 
+          - task: Kubernetes@1
+            displayName: "Apply Deployment using Kubernetes@1 Task"
+            inputs:
+              connectionType: "Kubernetes Service Connection"
+              kubernetesServiceEndpoint: "kubernetes-connection"
+              command: "apply"
+              useConfigurationFile: true
+              configuration: "manifests/deployment.yaml"
+              namespace: "default"
+
+          - task: KubernetesManifest@0
+            displayName: "Apply Blue Deployment"
+            inputs:
+              kubernetesServiceConnection: "kubernetes-connection"
+              action: "deploy"
               namespace: "default"
               manifests: "manifests/deployment.yaml"
               containers: |
