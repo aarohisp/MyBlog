@@ -86,6 +86,13 @@ stages:
                 az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER) || exit 1
                 echo "Logged into AKS cluster successfully."
 
+          # Echo out the image names for debugging
+          - script: |
+              echo "Using image for blue deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
+              echo "Using image for green deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
+              echo "Deploying blue image to myblog-blue-deployment and green image to myblog-green-deployment"
+            displayName: "Echo Image Names for Debugging"
+
           # Replace TAG in deployment.yaml
           - task: Bash@3
             displayName: "Replace TAG in deployment.yaml"
