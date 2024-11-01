@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myblog-green-deployment
+  name: myblog-blue-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: myblog-static-site
-      version: green # Label to distinguish green version
+      version: blue # Label to distinguish blue version
   template:
     metadata:
       labels:
         app: myblog-static-site
-        version: green
+        version: blue
     spec:
       containers:
         - name: nginx-container
-          image: mernblogregistry.azurecr.io/myblog-static-site:green-$(TAG)
+          image: mernblogregistry.azurecr.io/myblog-static-site:blue-$(TAG)
           ports:
             - containerPort: 80
 
