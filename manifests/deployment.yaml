@@ -17,7 +17,7 @@ spec:
       containers:
         - name: nginx-container
           # image: mernblogregistry.azurecr.io/myblog-static-site:blue-${TAG}
-          image: mernblogregistry.azurecr.io/myblog-static-site:blue-42v1
+          image: mernblogregistry.azurecr.io/myblog-static-site:blue-43v1
 
           ports:
             - containerPort: 80
@@ -42,7 +42,7 @@ spec:
       containers:
         - name: nginx-container
           # image: mernblogregistry.azurecr.io/myblog-static-site:green-$(TAG)
-          image: mernblogregistry.azurecr.io/myblog-static-site:green-42v1
+          image: mernblogregistry.azurecr.io/myblog-static-site:green-43v1
           ports:
             - containerPort: 80
 
