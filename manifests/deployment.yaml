@@ -7,16 +7,16 @@ spec:
   selector:
     matchLabels:
       app: myblog-static-site
-      version: $(DEPLOYMENT_COLOR) # Label to distinguish blue version
+      version: blue # Label to distinguish blue version
   template:
     metadata:
       labels:
         app: myblog-static-site
-        version: $(DEPLOYMENT_COLOR)
+        version: blue
     spec:
       containers:
         - name: nginx-container
-          image: mernblogregistry.azurecr.io/myblog-static-site:$(DEPLOYMENT_COLOR)-${TAG}
+          image: mernblogregistry.azurecr.io/myblog-static-site:blue-${TAG}
 
           ports:
             - containerPort: 80

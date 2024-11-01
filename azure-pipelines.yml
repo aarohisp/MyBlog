@@ -98,7 +98,7 @@ stages:
               namespace: "default"
 
           - task: KubernetesManifest@0
-            displayName: "Apply Blue Deployment"
+            displayName: "Apply Deployment"
             inputs:
               kubernetesServiceConnection: "kubernetes-connection"
               action: "deploy"
