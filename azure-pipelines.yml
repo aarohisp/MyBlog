@@ -60,11 +60,11 @@ stages:
                 az acr login --name $(ACR_NAME)
 
                 echo "Building and pushing images to ACR..."
-                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
-                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
 
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
+                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
+                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
 
                 echo "Images built and pushed successfully to ACR."
                 az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
@@ -124,9 +124,9 @@ stages:
               namespace: "default"
               manifests: "manifests/deployment.yaml"
               containers: |
-                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
 
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-43v1
+                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-43v1
             env:
               DEBUG: "true"
 
@@ -138,8 +138,8 @@ stages:
               namespace: "default"
               manifests: "manifests/deployment.yaml"
               containers: |
-                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-43v1
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
+                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-43v1
 
             env:
               DEBUG: "true"
@@ -147,6 +147,6 @@ stages:
           - script: |
               echo "Deployment completed successfully"
               echo "Deployed images:"
-              # echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
-              # echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
+              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
+              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
             displayName: "Deployment Confirmation"
