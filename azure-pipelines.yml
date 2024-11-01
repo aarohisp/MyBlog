@@ -16,10 +16,8 @@ variables:
   RESOURCE_GROUP: "Mern_blog"
   AKS_CLUSTER: "MernBlog"
   IMAGE_NAME: "myblog-static-site"
-  DEPLOYMENT_COLOR: "blue" # Change to "green" during demonstration
-
-  # Tag with color for blue-green
-  TAG: "deploy-$(DEPLOYMENT_COLOR)-$(Build.BuildId)"
+  TAG: "$(Build.BuildId)"
+  DEPLOYMENT_COLOR: "blue"
 
 pool:
   vmImage: "ubuntu-latest"
@@ -34,16 +32,22 @@ stages:
           vmImage: "ubuntu-latest"
         steps:
           - checkout: self
-            fetchDepth: 0 # Full repository history for consistent builds
+            fetchDepth: 0 # This clones the full repository history
 
+          - script: |
+              echo "Checking if repository files are available after checkout..."
+              ls -al
+              echo "Repository contents should be visible here"
+            displayName: "Verify Repository Checkout"
           - script: |
               echo "Starting Dockerfile creation for static site..."
               echo "FROM nginx:alpine" > Dockerfile
               echo "COPY src/index.html /usr/share/nginx/html/" >> Dockerfile
               echo "COPY src/style.css /usr/share/nginx/html/" >> Dockerfile
               echo "COPY src/script.js /usr/share/nginx/html/" >> Dockerfile
+              echo "Dockerfile created with the following content:"
+              cat Dockerfile
             displayName: "Create Dockerfile for Static Site"
-
           - task: AzureCLI@2
             displayName: "Build and Push to Azure Container Registry"
             inputs:
@@ -51,45 +55,22 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
+                echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                echo "Building and pushing images to ACR..."
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                echo "Images built and pushed successfully to ACR."
+                az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
 
-  - stage: Deploy
-    dependsOn: Package
-    displayName: "Deploy to AKS"
-    jobs:
-      - job: DeployToAKS
-        displayName: "Deploy Static Site to AKS"
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-          - task: AzureCLI@2
-            displayName: "Login to AKS Cluster"
-            inputs:
-              azureSubscription: "azure-connection"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
-                echo "Logged into AKS cluster."
-
-          # Echo out image names for debugging
-          - script: |
-              echo "Using image: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)"
-            displayName: "Echo Image for Deployment"
-
-          - task: KubernetesManifest@0
-            displayName: "Apply Blue-Green Deployment"
-            inputs:
-              kubernetesServiceConnection: "kubernetes-connection"
-              action: "deploy"
               namespace: "default"
               manifests: "manifests/deployment.yaml"
               containers: |
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):deploy-$(TAG)
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG)
             env:
-              DEPLOYMENT_COLOR: "$(DEPLOYMENT_COLOR)"
+              DEBUG: "true"
 
           - script: |
-              echo "Deployment completed for $(DEPLOYMENT_COLOR)."
+              echo "Deployment completed successfully"
+              echo "Deployed images:"
+              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG)"
             displayName: "Deployment Confirmation"
