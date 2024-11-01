@@ -16,11 +16,11 @@ spec:
     spec:
       containers:
         - name: nginx-container
-          image: mernblogregistry.azurecr.io/myblog-static-site:blue-${TAG}
-
+          image: mernblogregistry.azurecr.io/myblog-static-site:blue-<TAG>
           ports:
             - containerPort: 80
-            
+
+---
 apiVersion: v1
 kind: Service
 metadata:
