@@ -63,8 +63,8 @@ stages:
                 # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
                 # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
 
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-41v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-41v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-42v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-42v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
 
                 echo "Images built and pushed successfully to ACR."
                 az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
@@ -126,7 +126,7 @@ stages:
               containers: |
                 # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
 
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-41v1
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-42v1
             env:
               DEBUG: "true"
 
@@ -139,7 +139,7 @@ stages:
               manifests: "manifests/deployment.yaml"
               containers: |
                 # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-41v1
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-42v1
 
             env:
               DEBUG: "true"
