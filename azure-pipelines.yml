@@ -16,7 +16,10 @@ variables:
   RESOURCE_GROUP: "Mern_blog"
   AKS_CLUSTER: "MernBlog"
   IMAGE_NAME: "myblog-static-site"
-  TAG: "$(Build.BuildId)"
+  DEPLOYMENT_COLOR: "blue" # Change to "green" during demonstration
+
+  # Tag with color for blue-green
+  TAG: "deploy-$(DEPLOYMENT_COLOR)-$(Build.BuildId)"
 
 pool:
   vmImage: "ubuntu-latest"
@@ -31,13 +34,7 @@ stages:
           vmImage: "ubuntu-latest"
         steps:
           - checkout: self
-            fetchDepth: 0 # This clones the full repository history
-
-          - script: |
-              echo "Checking if repository files are available after checkout..."
-              ls -al
-              echo "Repository contents should be visible here"
-            displayName: "Verify Repository Checkout"
+            fetchDepth: 0 # Full repository history for consistent builds
 
           - script: |
               echo "Starting Dockerfile creation for static site..."
@@ -45,8 +42,6 @@ stages:
               echo "COPY src/index.html /usr/share/nginx/html/" >> Dockerfile
               echo "COPY src/style.css /usr/share/nginx/html/" >> Dockerfile
               echo "COPY src/script.js /usr/share/nginx/html/" >> Dockerfile
-              echo "Dockerfile created with the following content:"
-              cat Dockerfile
             displayName: "Create Dockerfile for Static Site"
 
           - task: AzureCLI@2
@@ -56,18 +51,8 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
-
-                echo "Building and pushing images to ACR..."
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
-
-                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
-                # az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-43v1 -f "$(Build.SourcesDirectory)/Dockerfile" .
-
-                echo "Images built and pushed successfully to ACR."
-                az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
 
   - stage: Deploy
     dependsOn: Package
@@ -76,7 +61,7 @@ stages:
       - job: DeployToAKS
         displayName: "Deploy Static Site to AKS"
         pool:
-          vmImage: "ubuntu-latest" # Using Azure-hosted agent instead of self-hosted
+          vmImage: "ubuntu-latest"
         steps:
           - task: AzureCLI@2
             displayName: "Login to AKS Cluster"
@@ -85,68 +70,26 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                echo "Retrieving AKS credentials for cluster: $(AKS_CLUSTER) in resource group: $(RESOURCE_GROUP)"
-                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER) || exit 1
-                echo "Logged into AKS cluster successfully."
+                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
+                echo "Logged into AKS cluster."
 
-          # Echo out the image names for debugging
+          # Echo out image names for debugging
           - script: |
-              echo "Using image for blue deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
-              echo "Using image for green deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
-              echo "Deploying blue image to myblog-blue-deployment and green image to myblog-green-deployment"
-            displayName: "Echo Image Names for Debugging"
-
-          # # Replace TAG in deployment.yaml
-          # - task: Bash@3
-          #   displayName: "Replace TAG in deployment.yaml"
-          #   inputs:
-          #     targetType: "inline"
-          #     script: |
-          #       sed -i "s/blue-$(TAG)/blue-${{ variables.TAG }}/g" manifests/deployment.yaml
-          #       sed -i "s/green-$(TAG)/green-${{ variables.TAG }}/g" manifests/deployment.yaml
-
-          # Apply Kubernetes manifest with Kubernetes@1 task
-          - task: Kubernetes@1
-            displayName: "Apply Deployment using Kubernetes@1 Task"
-            inputs:
-              connectionType: "Kubernetes Service Connection"
-              kubernetesServiceEndpoint: "kubernetes-connection"
-              command: "apply"
-              useConfigurationFile: true
-              configuration: "manifests/deployment.yaml"
-              namespace: "default"
+              echo "Using image: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)"
+            displayName: "Echo Image for Deployment"
 
           - task: KubernetesManifest@0
-            displayName: "Apply Blue Deployment"
+            displayName: "Apply Blue-Green Deployment"
             inputs:
               kubernetesServiceConnection: "kubernetes-connection"
               action: "deploy"
               namespace: "default"
-              manifests: "manifests/deployment.yaml"
+              manifests: "manifests/deployment.yaml" # Same file, dynamic image reference
               containers: |
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)
-
-                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-43v1
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
             env:
-              DEBUG: "true"
-
-          - task: KubernetesManifest@0
-            displayName: "Apply Green Deployment"
-            inputs:
-              kubernetesServiceConnection: "kubernetes-connection"
-              action: "deploy"
-              namespace: "default"
-              manifests: "manifests/deployment.yaml"
-              containers: |
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)
-                # $(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-43v1
-
-            env:
-              DEBUG: "true"
+              DEPLOYMENT_COLOR: "$(DEPLOYMENT_COLOR)" # Used for manifest templating if needed
 
           - script: |
-              echo "Deployment completed successfully"
-              echo "Deployed images:"
-              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):blue-$(TAG)"
-              echo "$(ACR_NAME).azurecr.io/$(IMAGE_NAME):green-$(TAG)"
+              echo "Deployment completed for $(DEPLOYMENT_COLOR)."
             displayName: "Deployment Confirmation"
