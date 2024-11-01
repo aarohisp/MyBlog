@@ -84,11 +84,11 @@ stages:
               kubernetesServiceConnection: "kubernetes-connection"
               action: "deploy"
               namespace: "default"
-              manifests: "manifests/deployment.yaml" # Same file, dynamic image reference
+              manifests: "manifests/deployment.yaml"
               containers: |
-                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(TAG)
+                $(ACR_NAME).azurecr.io/$(IMAGE_NAME):deploy-$(TAG)
             env:
-              DEPLOYMENT_COLOR: "$(DEPLOYMENT_COLOR)" # Used for manifest templating if needed
+              DEPLOYMENT_COLOR: "$(DEPLOYMENT_COLOR)"
 
           - script: |
               echo "Deployment completed for $(DEPLOYMENT_COLOR)."

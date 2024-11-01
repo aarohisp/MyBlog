@@ -1,19 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myblog-{{ DEPLOYMENT_COLOR }}
+  name: myblog-$(DEPLOYMENT_COLOR)
+  labels:
+    app: myblog-$(DEPLOYMENT_COLOR)
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: myblog-{{ DEPLOYMENT_COLOR }}
+      app: myblog-$(DEPLOYMENT_COLOR)
   template:
     metadata:
       labels:
-        app: myblog-{{ DEPLOYMENT_COLOR }}
+        app: myblog-$(DEPLOYMENT_COLOR)
     spec:
       containers:
-        - name: myblog-container
-          image: "{{ ACR_NAME }}.azurecr.io/{{ IMAGE_NAME }}:{{ TAG }}"
-          ports:
-            - containerPort: 80
+      - name: myblog-container
+        image: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):deploy-$(TAG)
