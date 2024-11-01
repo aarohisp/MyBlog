@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx-container
-          image: mernblogregistry.azurecr.io/myblog-static-site:blue-$(TAG) # Use a specific tag for blue
+          image: mernblogregistry.azurecr.io/myblog-static-site:blue-${TAG}
           ports:
             - containerPort: 80
 

@@ -64,6 +64,7 @@ stages:
                 az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):green-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
 
                 echo "Images built and pushed successfully to ACR."
+                az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
 
   - stage: Deploy
     dependsOn: Package
@@ -82,8 +83,17 @@ stages:
               scriptLocation: "inlineScript"
               inlineScript: |
                 echo "Retrieving AKS credentials for cluster: $(AKS_CLUSTER) in resource group: $(RESOURCE_GROUP)"
-                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER)
+                az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER) || exit 1
                 echo "Logged into AKS cluster successfully."
+
+          # Replace TAG in deployment.yaml
+          - task: Bash@3
+            displayName: "Replace TAG in deployment.yaml"
+            inputs:
+              targetType: "inline"
+              script: |
+                sed -i "s/blue-$(TAG)/blue-${{ variables.TAG }}/g" manifests/deployment.yaml
+                sed -i "s/green-$(TAG)/green-${{ variables.TAG }}/g" manifests/deployment.yaml
 
           # Apply Kubernetes manifest with Kubernetes@1 task
           - task: Kubernetes@1
