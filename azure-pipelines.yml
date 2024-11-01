@@ -60,7 +60,7 @@ stages:
                 echo "Logging into Azure Container Registry: $(ACR_NAME)"
                 az acr login --name $(ACR_NAME)
                 echo "Building and pushing images to ACR..."
-                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):blue-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
+                az acr build --registry $(ACR_NAME) --image $(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG) -f "$(Build.SourcesDirectory)/Dockerfile" .
                 echo "Images built and pushed successfully to ACR."
                 az acr repository show-tags --name $(ACR_NAME) --repository $(IMAGE_NAME)
   - stage: Deploy
@@ -84,7 +84,7 @@ stages:
                 echo "Logged into AKS cluster successfully."
           # Echo out the image names for debugging
           - script: |
-              echo "Using image for blue deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG)"
+              echo "Using image for deployment: $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(DEPLOYMENT_COLOR)-$(TAG)"
             displayName: "Echo Image Names for Debugging"
 
           - task: Kubernetes@1
