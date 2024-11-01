@@ -17,7 +17,7 @@ variables:
   AKS_CLUSTER: "MernBlog"
   IMAGE_NAME: "myblog-static-site"
   TAG: "$(Build.BuildId)"
-  DEPLOYMENT_COLOR: "blue"
+  DEPLOYMENT_COLOR: "green"
 
 pool:
   vmImage: "ubuntu-latest"
