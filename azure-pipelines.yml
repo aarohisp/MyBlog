@@ -13,8 +13,8 @@ resources:
 variables:
   # AKS variables
   ACR_NAME: "mernblogregistry"
-  RESOURCE_GROUP: "Mern_blog"
-  AKS_CLUSTER: "MernBlog"
+  RESOURCE_GROUP: "AKS"
+  AKS_CLUSTER: "ASPK8s"
   IMAGE_NAME: "myblog-static-site"
   TAG: "$(Build.BuildId)"
   DEPLOYMENT_COLOR: "blue"
